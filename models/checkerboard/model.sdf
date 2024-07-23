@@ -19,8 +19,8 @@
         </geometry>
         <material>
           <script>
-            <uri>model://checkerboard/materials/scripts</uri>
-            <uri>model://checkerboard/materials/textures</uri>
+            <uri>model://checkerboard/materials/scripts/checkerboard.material</uri>
+            <uri>model://checkerboard/materials/textures/checkerboard.png</uri>
             <name>Checkerboard/Diffuse</name>
           </script>
         </material>

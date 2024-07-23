@@ -17,7 +17,7 @@ class CheckerboardCapture:
         self.bridge = CvBridge()
         self.image_count = 0
         self.num_images = rospy.get_param('~num_images', 20)
-        self.output_dir = rospy.get_param('~output_dir', 'fisheye_images')
+        self.output_dir = rospy.get_param('~output_dir', 'images')
         
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
@@ -27,18 +27,28 @@ class CheckerboardCapture:
         rospy.wait_for_service('/gazebo/set_model_state')
         self.set_model_state = rospy.ServiceProxy('/gazebo/set_model_state', gazebo_msgs.srv.SetModelState)
         
+        self.ready_to_capture = False
+        self.latest_image = None
+        
         # Wait for models to spawn
-        rospy.sleep(15)
+        rospy.sleep(5)
         
         self.capture_images()
 
     def image_callback(self, msg):
-        if self.image_count < self.num_images:
-            cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+        if self.ready_to_capture:
+            self.latest_image = msg
+            self.save_image()
+
+    def save_image(self):
+        if self.latest_image is not None and self.image_count < self.num_images:
+            cv_image = self.bridge.imgmsg_to_cv2(self.latest_image, "bgr8")
             filename = os.path.join(self.output_dir, f'checkerboard_{self.image_count:03d}.png')
             cv2.imwrite(filename, cv_image)
             rospy.loginfo(f"Saved image {self.image_count + 1}/{self.num_images}")
             self.image_count += 1
+            self.ready_to_capture = False
+            self.latest_image = None
 
     def set_checkerboard_pose(self, x, y, z, roll, pitch, yaw):
         state_msg = gazebo_msgs.msg.ModelState()
@@ -72,14 +82,19 @@ class CheckerboardCapture:
         return q
 
     def capture_images(self):
+        import numpy as np
+        board_horizontal_range = np.linspace(-0.125, 0.125, self.num_images)
         for i in range(self.num_images):
+            # arbitrary rotation
             angle = -135 + (270 / (self.num_images - 1)) * i
             roll = math.radians(angle)
-            pitch = math.radians(angle / 2)  # Adjust as needed
+            pitch = math.radians(angle / 2)
             yaw = 0
             
-            self.set_checkerboard_pose(1, 0, 0.5, roll, pitch, yaw)
-            rospy.sleep(1)  # Wait for the checkerboard to move and the image to update
+            self.set_checkerboard_pose(0.75, board_horizontal_range[i], 1 + board_horizontal_range[i], roll, pitch, yaw)
+            rospy.sleep(0.5)  # Wait for the checkerboard to move
+            self.ready_to_capture = True
+            rospy.sleep(0.5)  # Wait for the image to update
 
         rospy.signal_shutdown("Finished capturing images")
 

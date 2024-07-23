@@ -1,25 +1,27 @@
 <launch>
-  <!-- Launch Gazebo with the willowgarage world -->
+  <!-- Launch Gazebo with the default world, you can change it freely -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="worlds/willowgarage.world"/>
+    <arg name="world_name" value="worlds/empty.world"/>
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
     <arg name="gui" value="true"/>
   </include>
 
+  <env name="GAZEBO_MODEL_PATH" value="$(find gazebo_fisheye_sim)/models:$(optenv GAZEBO_MODEL_PATH)"/>
+  
   <!-- Spawn the fisheye camera -->
   <node name="spawn_camera" pkg="gazebo_ros" type="spawn_model"
-        args="-sdf -file $(find gazebo_fisheye_sim)/models/fisheye_camera/model.sdf -model fisheye_camera"
+        args="-sdf -file $(find gazebo_fisheye_sim)/models/fisheye_camera/model.sdf -model fisheye_camera -x 0 -y 0 -z 1"
         output="screen"/>
 
   <!-- Spawn the checkerboard -->
   <node name="spawn_checkerboard" pkg="gazebo_ros" type="spawn_model"
-        args="-sdf -file $(find gazebo_fisheye_sim)/models/checkerboard/model.sdf -model checkerboard"
+        args="-sdf -file $(find gazebo_fisheye_sim)/models/checkerboard/model.sdf -model checkerboard -x 2 -y 0 -z 1"
         output="screen"/>
 
   <!-- Run the Python script to automate image capture -->
-  <node name="checkerboard_image_capture" pkg="gazebo_fisheye_sim" type="capture_checkerboard_images.py" output="screen">
+  <node name="checkerboard_image_capture" pkg="gazebo_fisheye_sim" type="capture_checkerboard_images.py" output="screen" required="true">
     <param name="num_images" value="20"/>
-    <param name="output_dir" value="$(find gazebo_fisheye_sim)/resources/images"/>
+    <param name="output_dir" value="$(find gazebo_fisheye_sim)/fisheye_images"/>
   </node>
 </launch>
