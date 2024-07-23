@@ -83,15 +83,17 @@ class CheckerboardCapture:
 
     def capture_images(self):
         import numpy as np
-        board_horizontal_range = np.linspace(-0.125, 0.125, self.num_images)
+        board_horizontal_range = np.linspace(-0.2, 0.2, self.num_images)
+        angle_max = math.radians(30)
+        angle_range = np.linspace(-angle_max, angle_max, self.num_images)
+        pitch_range = angle_range + math.pi/2
+        roll_range = angle_range
         for i in range(self.num_images):
-            # arbitrary rotation
-            angle = -135 + (270 / (self.num_images - 1)) * i
-            roll = math.radians(angle)
-            pitch = math.radians(angle / 2)
+            roll = roll_range[i]
+            pitch = pitch_range[i]
             yaw = 0
             
-            self.set_checkerboard_pose(0.75, board_horizontal_range[i], 1 + board_horizontal_range[i], roll, pitch, yaw)
+            self.set_checkerboard_pose(0.45, board_horizontal_range[i], 1 + board_horizontal_range[i], roll, pitch, yaw)
             rospy.sleep(0.5)  # Wait for the checkerboard to move
             self.ready_to_capture = True
             rospy.sleep(0.5)  # Wait for the image to update
