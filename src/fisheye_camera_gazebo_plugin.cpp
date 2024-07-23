@@ -1,4 +1,4 @@
-#include "fisheye_camera_gazebo_plugin.h"
+#include "gazebo_fisheye_sim/fisheye_camera_gazebo_plugin.h"
 #include <gazebo/physics/physics.hh>
 #include <gazebo/common/common.hh>
 #include <opencv2/imgproc.hpp>

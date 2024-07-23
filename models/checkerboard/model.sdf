@@ -1,18 +1,27 @@
 <?xml version="1.0" ?>
-<sdf version="1.6">
+<sdf version="1.5">
   <model name="checkerboard">
     <static>true</static>
     <link name="link">
+      <pose>0 0 0 0 0 0</pose>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.5 0.5 0.01</size>
+          </box>
+        </geometry>
+      </collision>
       <visual name="visual">
         <geometry>
-          <plane>
-            <size>1 1</size>
-          </plane>
+          <box>
+            <size>0.5 0.5 0.01</size>
+          </box>
         </geometry>
         <material>
           <script>
-            <uri>file://media/materials/scripts/checkerboard.material</uri>
-            <name>Checkerboard</name>
+            <uri>model://checkerboard/materials/scripts</uri>
+            <uri>model://checkerboard/materials/textures</uri>
+            <name>Checkerboard/Diffuse</name>
           </script>
         </material>
       </visual>

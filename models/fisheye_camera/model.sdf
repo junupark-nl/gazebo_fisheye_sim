@@ -1,31 +1,51 @@
 <?xml version="1.0" ?>
-<sdf version="1.6">
+<sdf version="1.5">
   <model name="fisheye_camera">
     <static>true</static>
     <link name="link">
+      <pose>0 0 0.05 0 0 0</pose>
+      <inertial>
+        <mass>0.1</mass>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.1 0.1 0.1</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+            <size>0.1 0.1 0.1</size>
+          </box>
+        </geometry>
+      </visual>
       <sensor name="camera" type="camera">
         <camera>
-          <horizontal_fov>1.5708</horizontal_fov>
+          <!-- 120 degrees -->
+          <horizontal_fov>2.0944</horizontal_fov>
           <image>
-            <width>1280</width>
-            <height>720</height>
-            <format>R8G8B8</format>
+            <width>640</width>
+            <height>480</height>
           </image>
           <clip>
-            <near>0.1</near>
+            <near>0.01</near>
             <far>100</far>
           </clip>
-          <distortion>
-            <k1>-0.2</k1>
-            <k2>0.0</k2>
-            <k3>0.0</k3>
-            <p1>0.0</p1>
-            <p2>0.0</p2>
-            <center>0.5, 0.5</center>
-          </distortion>
         </camera>
-        <always_on>true</always_on>
-        <update_rate>30.0</update_rate>
+        <plugin name="camera_controller" filename="libfisheye_camera_gazebo_plugin.so">
+          <k1>-0.21</k1>
+          <k2>0.026</k2>
+          <k3>-0.00047</k3>
+          <k4>0.000001</k4>
+          <fx>320</fx>
+          <fy>320</fy>
+          <cx>320</cx>
+          <cy>240</cy>
+        </plugin>
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
         <visualize>true</visualize>
       </sensor>
     </link>

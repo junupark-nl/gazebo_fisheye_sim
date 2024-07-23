@@ -112,7 +112,7 @@ find_package(OpenCV REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
  INCLUDE_DIRS include
- LIBRARIES fisheye_camera_plugin
+ LIBRARIES fisheye_camera_gazebo_plugin
  CATKIN_DEPENDS cv_bridge gazebo_ros roscpp rospy sensor_msgs std_msgs geometry_msgs
 #  DEPENDS system_lib
 )
@@ -135,8 +135,8 @@ include_directories(
 #   src/${PROJECT_NAME}/gazebo_fisheye_sim.cpp
 # )
 
-add_library(fisheye_camera_plugin src/fisheye_camera_plugin.cpp)
-target_link_libraries(fisheye_camera_plugin 
+add_library(fisheye_camera_gazebo_plugin src/fisheye_camera_gazebo_plugin.cpp)
+target_link_libraries(fisheye_camera_gazebo_plugin 
   ${catkin_LIBRARIES} 
   ${GAZEBO_LIBRARIES}
   ${OpenCV_LIBS}

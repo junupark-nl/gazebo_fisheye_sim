@@ -17,7 +17,7 @@ class CheckerboardCapture:
         self.bridge = CvBridge()
         self.image_count = 0
         self.num_images = rospy.get_param('~num_images', 20)
-        self.output_dir = rospy.get_param('~output_dir', 'images')
+        self.output_dir = rospy.get_param('~output_dir', 'fisheye_images')
         
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
@@ -26,6 +26,9 @@ class CheckerboardCapture:
         
         rospy.wait_for_service('/gazebo/set_model_state')
         self.set_model_state = rospy.ServiceProxy('/gazebo/set_model_state', gazebo_msgs.srv.SetModelState)
+        
+        # Wait for models to spawn
+        rospy.sleep(15)
         
         self.capture_images()
 
