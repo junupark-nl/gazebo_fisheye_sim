@@ -1,0 +1,7 @@
+<launch>
+  <arg name="x" default="0" />
+  <arg name="y" default="0" />
+  <arg name="z" default="0" />
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_checkerboard" output="screen"
+        args="-file $(find fisheye_calibration)/models/checkerboard/model.sdf -sdf -model checkerboard -x $(arg x) -y $(arg y) -z $(arg z)" />
+</launch>

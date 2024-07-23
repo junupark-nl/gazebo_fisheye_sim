@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="checkerboard">
+    <static>true</static>
+    <link name="link">
+      <visual name="visual">
+        <geometry>
+          <plane>
+            <size>1 1</size>
+          </plane>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/checkerboard.material</uri>
+            <name>Checkerboard</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>
