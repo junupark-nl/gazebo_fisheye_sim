@@ -1,4 +1,6 @@
 <launch>
+  <arg name="num_grid" default="7"/>
+  <arg name="num_skew" default="3"/>
   <!-- Launch Gazebo with the default world, you can change it freely -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="worlds/empty.world"/>
@@ -21,7 +23,8 @@
 
   <!-- Run the Python script to automate image capture -->
   <node name="checkerboard_image_capture" pkg="gazebo_fisheye_sim" type="capture_checkerboard_images.py" output="screen" required="true">
-    <param name="num_images" value="20"/>
+    <param name="num_grid" value="$(arg num_grid)"/>
+    <param name="num_skew" value="$(arg num_skew)"/>
     <param name="output_dir" value="$(find gazebo_fisheye_sim)/fisheye_images"/>
   </node>
 </launch>

@@ -46,6 +46,8 @@ namespace gazebo
       this->cx = _sdf->Get<double>("cx");
     if (_sdf->HasElement("cy"))
       this->cy = _sdf->Get<double>("cy");
+    std::cout<<"fx: "<<fx<< " fy: "<<fy<< " cx: "<<cx<< " cy: "<<cy<<std::endl;
+    std::cout<<"k1: "<<k1<< " k2: "<<k2<< " k3: "<<k3<< " k4: "<<k4<<std::endl;
 
     // Initialize ROS
     if (!ros::isInitialized())

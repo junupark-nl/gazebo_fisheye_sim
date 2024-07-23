@@ -16,7 +16,9 @@ class CheckerboardCapture:
         
         self.bridge = CvBridge()
         self.image_count = 0
-        self.num_images = rospy.get_param('~num_images', 20)
+        self.num_grid = rospy.get_param('~num_grid', 7)
+        self.num_skew = rospy.get_param('~num_skew', 5)
+        self.num_images = self.num_grid * self.num_grid * self.num_skew
         self.output_dir = rospy.get_param('~output_dir', 'images')
         
         if not os.path.exists(self.output_dir):
@@ -83,20 +85,26 @@ class CheckerboardCapture:
 
     def capture_images(self):
         import numpy as np
-        board_horizontal_range = np.linspace(-0.2, 0.2, self.num_images)
-        angle_max = math.radians(30)
-        angle_range = np.linspace(-angle_max, angle_max, self.num_images)
-        pitch_range = angle_range + math.pi/2
+        angle_max = math.radians(15)
+        grid_max = 0.25
+        board_horizontal_range = np.linspace(-grid_max, grid_max, self.num_grid)
+        board_vertical_range = np.linspace(-grid_max, grid_max, self.num_grid)
+        angle_range = np.linspace(-angle_max, angle_max, self.num_skew)
         roll_range = angle_range
-        for i in range(self.num_images):
-            roll = roll_range[i]
-            pitch = pitch_range[i]
-            yaw = 0
-            
-            self.set_checkerboard_pose(0.45, board_horizontal_range[i], 1 + board_horizontal_range[i], roll, pitch, yaw)
-            rospy.sleep(0.5)  # Wait for the checkerboard to move
-            self.ready_to_capture = True
-            rospy.sleep(0.5)  # Wait for the image to update
+        yaw_range = angle_range / 10
+        for i in range(self.num_grid):
+            for j in range(self.num_grid):
+                for k in range(self.num_skew):
+                    roll = roll_range[k]
+                    pitch = math.pi/2
+                    yaw = 0
+                    x = 0.6 + 0.05*np.random.randint(1, 100)/100
+                    y = board_horizontal_range[i]
+                    z = board_vertical_range[j] + 1
+                    self.set_checkerboard_pose(x, y, z, roll, pitch, yaw)
+                    rospy.sleep(0.1)  # Wait for the checkerboard to move
+                    self.ready_to_capture = True
+                    rospy.sleep(0.1)  # Wait for the image to update
 
         rospy.signal_shutdown("Finished capturing images")
 
