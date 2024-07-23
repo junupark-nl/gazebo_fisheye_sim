@@ -2,15 +2,22 @@
 #include <gazebo/physics/physics.hh>
 #include <gazebo/common/common.hh>
 #include <opencv2/imgproc.hpp>
+#include <cv_bridge/cv_bridge.h>
 
 namespace gazebo
 {
   GZ_REGISTER_SENSOR_PLUGIN(FisheyeCameraPlugin)
 
-  FisheyeCameraPlugin::FisheyeCameraPlugin() : SensorPlugin() {}
+  FisheyeCameraPlugin::FisheyeCameraPlugin() : SensorPlugin(), rosNode(NULL) {}
 
-  FisheyeCameraPlugin::~FisheyeCameraPlugin() {}
-
+  FisheyeCameraPlugin::~FisheyeCameraPlugin()
+  {
+    if (rosNode)
+    {
+      rosNode->shutdown();
+      delete rosNode;
+    }
+  }
   void FisheyeCameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
   {
     // Load camera parameters
@@ -40,6 +47,18 @@ namespace gazebo
     if (_sdf->HasElement("cy"))
       this->cy = _sdf->Get<double>("cy");
 
+    // Initialize ROS
+    if (!ros::isInitialized())
+    {
+      int argc = 0;
+      char **argv = NULL;
+      ros::init(argc, argv, "gazebo_client", ros::init_options::NoSigintHandler);
+    }
+    this->rosNode = new ros::NodeHandle();
+
+    // Create ROS publisher
+    this->imagePub = this->rosNode->advertise<sensor_msgs::Image>("fisheye_camera/image_raw", 1);
+
     // Connect new frame event
     this->newFrameConnection = this->camera->ConnectNewImageFrame(
       std::bind(&FisheyeCameraPlugin::OnNewFrame, this,
@@ -60,10 +79,9 @@ namespace gazebo
     // Apply fisheye distortion
     cv::Mat distorted = distortImage(original);
     
-    // Here you would typically publish the distorted image to a ROS topic
-    // For simplicity, we'll just save it to a file
-    static int frame_count = 0;
-    cv::imwrite("fisheye_frame_" + std::to_string(frame_count++) + ".png", distorted);
+    // Convert to ROS image message and publish
+    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", distorted).toImageMsg();
+    this->imagePub.publish(msg);
   }
 
   cv::Mat FisheyeCameraPlugin::distortImage(const cv::Mat& src)
